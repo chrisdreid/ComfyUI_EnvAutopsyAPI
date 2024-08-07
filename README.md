@@ -2,6 +2,26 @@
 
 ComfyUI_EnvAutopsyAPI is a powerful debugging tool designed for ComfyUI that provides in-depth analysis of your environment and dependencies through an API interface. This tool allows you to inspect environment variables, pip packages, and dependency trees, making it easier to diagnose and resolve issues in your ComfyUI setup.
 
+## ⚠️ WARNING: SECURITY RISK ⚠️
+
+### ❗ This tool may expose sensitive system information if used on a public server ❗
+
+**Important:** 
+- This tool is designed for **debugging your local ComfyUI environment**.
+- If your ComfyUI instance is **publicly accessible**:
+  - **DO NOT** use these tools without proper security measures.
+  - They can expose:
+    - System environment details
+    - File paths
+    - Installation directories
+    - Overall system configuration
+
+**Intended Use:** 
+- For personal debugging only
+- On secure, private environments
+
+**Remember:** Always prioritize your system's security when using diagnostic tools.
+
 ## Features
 
 - Retrieve and display environment variables
@@ -10,6 +30,14 @@ ComfyUI_EnvAutopsyAPI is a powerful debugging tool designed for ComfyUI that pro
 - Provide warnings about potential conflicts in your Python environment
 - Serve results in various formats (HTML, JSON, plain text)
 - Integrate seamlessly with ComfyUI's existing API structure
+
+## Future Features
+
+- Compare/Diff any endpoint with data passed through request or another url to access.
+- Restart ComfyUI 
+  - System process
+  - Docker container
+  - Docker container process
 
 ## Installation
 
