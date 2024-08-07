@@ -25,9 +25,20 @@ Once installed, ComfyUI_EnvAutopsyAPI adds the following endpoints to your Comfy
 
 - `/api/env`: Displays all environment variables
 - `/api/pip_freeze`: Lists all installed pip packages
-- `/dependency_tree`: Generates and displays the dependency tree
+- `/dependency_tree`: Generates and displays the dependency tree and possible conflicts
+
+Example Url: http://localhost:8188/api/dependency_tree
 
 Access these endpoints through your web browser or API client to perform an "autopsy" on your ComfyUI environment.
+
+Dependency Tree:</br>
+<img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/dependency_tree.png" width="200" alt="Dependency Tree"></br>
+Dependency Tree Text-Only:</br>
+<img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/dependency_tree-text.png" width="200" alt="Dependency Tree"></br>
+Environment Variables:</br>
+<img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/env_vars.png" width="200" alt="Environment Variables"></br>
+Pip Freeze:</br>
+<img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/pip_freeze.png" width="200" alt="Pip Freeze"></br>
 
 ## Workflow
 
