@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pip Freeze</title>
+    <link rel="stylesheet" href="/env-debug-utils/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pip Freeze</h1>
+        
+        <button id="toggleView" class="button" onclick="toggleView()">Switch to Raw Text View</button>
+
+        <div id="styledView">
+            {% for package in packages %}
+            <div class="package">
+                <span class="package-name">{{ package.name }}</span>
+                <span class="package-version">{{ package.version }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="rawTextView"></div>
+    </div>
+
+    <script>
+        function generateRawTextView() {
+            var rawText = "";
+            {% for package in packages %}
+            rawText += "{{ package.name }}=={{ package.version }}\n";
+            {% endfor %}
+            document.getElementById('rawTextView').textContent = rawText;
+        }
+
+        function toggleView() {
+            var styledView = document.getElementById('styledView');
+            var rawTextView = document.getElementById('rawTextView');
+            var button = document.getElementById('toggleView');
+
+            if (styledView.style.display !== 'none') {
+                styledView.style.display = 'none';
+                rawTextView.style.display = 'block';
+                button.textContent = 'Switch to Styled View';
+            } else {
+                styledView.style.display = 'block';
+                rawTextView.style.display = 'none';
+                button.textContent = 'Switch to Raw Text View';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            generateRawTextView();
+        });
+    </script>
+</body>
+</html>

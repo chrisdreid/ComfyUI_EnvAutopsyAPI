@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment Variables</title>
+    <link rel="stylesheet" href="/env-debug-utils/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Environment Variables</h1>
+        
+        <button id="toggleView" class="button" onclick="toggleView()">Switch to Raw Text View</button>
+        <button id="toggleAll" class="button" onclick="toggleAllEnvVars()">Collapse All</button>
+
+        <div id="styledView">
+            {% for name, value in environment.items() %}
+            {% set values = value.split(os.pathsep) %}
+            <div class="env-var">
+                <div class="env-name" onclick="toggleEnvVar(this)">
+                    <span class="toggle-icon">▼</span> {{ name }}
+                </div>
+                <div class="env-value">
+                    {% if values|length > 1 %}
+                        {% for val in values %}
+                        <div class="env-value-item">{{ val }}</div>
+                        {% endfor %}
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="rawTextView"></div>
+    </div>
+
+    <script>
+        function generateRawTextView() {
+            var rawText = "";
+            {% for name, value in environment.items() %}
+            rawText += "{{ name }}={{ value }}\n";
+            {% endfor %}
+            document.getElementById('rawTextView').textContent = rawText;
+        }
+
+        function toggleView() {
+            var styledView = document.getElementById('styledView');
+            var rawTextView = document.getElementById('rawTextView');
+            var button = document.getElementById('toggleView');
+
+            if (styledView.style.display !== 'none') {
+                styledView.style.display = 'none';
+                rawTextView.style.display = 'block';
+                button.textContent = 'Switch to Styled View';
+            } else {
+                styledView.style.display = 'block';
+                rawTextView.style.display = 'none';
+                button.textContent = 'Switch to Raw Text View';
+            }
+        }
+
+        function toggleEnvVar(element) {
+            var envVar = element.parentElement;
+            envVar.classList.toggle('collapsed');
+            updateToggleAllButton();
+        }
+
+        function toggleAllEnvVars() {
+            var envVars = document.querySelectorAll('.env-var');
+            var toggleAllButton = document.getElementById('toggleAll');
+            var allExpanded = Array.from(envVars).every(envVar => !envVar.classList.contains('collapsed'));
+            
+            envVars.forEach(function(envVar) {
+                envVar.classList.toggle('collapsed', allExpanded);
+            });
+            
+            updateToggleAllButton();
+        }
+            
+        function updateToggleAllButton() {
+            var envVars = document.querySelectorAll('.env-var');
+            var toggleAllButton = document.getElementById('toggleAll');
+            var allCollapsed = Array.from(envVars).every(envVar => envVar.classList.contains('collapsed'));
+            
+            toggleAllButton.textContent = allCollapsed ? 'Expand All' : 'Collapse All';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            generateRawTextView();
+            updateToggleAllButton();
+        });
+    </script>
+</body>
+</html>

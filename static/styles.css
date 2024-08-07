@@ -1,0 +1,155 @@
+/* static/styles.css */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+.button:hover {
+    background-color: #45a049;
+}
+
+/* Environment Variables Styles */
+.env-var {
+    margin-bottom: 5px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border-left: 5px solid #3498db;
+    transition: max-height 0.3s ease-out;
+}
+
+.env-name {
+    font-weight: bold;
+    color: #2980b9;
+    cursor: pointer;
+    padding: 5px 10px;
+    display: block;
+    position: sticky;
+    top: 0;
+    background-color: #f9f9f9;
+    z-index: 1;
+}
+
+.env-name:hover {
+    background-color: #eef7ff;
+}
+
+.env-value {
+    margin-left: 10px;
+    word-break: break-all;
+    padding: 2px 5px;
+    max-height: 5000px;
+    overflow-y: auto;
+    transition: max-height 0.3s ease-out;
+}
+
+/* .env-var-multi .env-value {
+    max-height: none;
+    overflow-y: visible;
+} */
+
+.env-value-item {
+    padding: 2px 0;
+    background-color: #f0f8ff;
+    margin-bottom: 2px;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.collapsed {
+    max-height: 45px; /* Adjust this value based on your env-name height */
+}
+
+.collapsed .env-value {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 10px;
+}
+
+.toggle-icon {
+    display: inline-block;
+    width: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.env-value::-webkit-scrollbar {
+    width: 8px;
+}
+
+.env-value::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.env-value::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.env-value::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Pip Freeze Styles */
+.package {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border-left: 5px solid #27ae60;
+}
+
+.package-name {
+    font-weight: bold;
+    color: #2980b9;
+}
+
+.package-version {
+    color: #27ae60;
+    margin-left: 8px;
+}
+
+#rawTextView {
+    white-space: pre-wrap;
+    font-family: monospace;
+    display: none;
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+}

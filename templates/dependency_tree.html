@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dependency Tree</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .warnings {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffeeba;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .warnings h2 {
+            color: #856404;
+            margin-top: 0;
+            cursor: pointer;
+        }
+        .warnings h2:hover {
+            text-decoration: underline;
+        }
+        .warnings-content {
+            display: none;
+            margin-top: 10px;
+        }
+        .warning-item {
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #fffbf0;
+            border-radius: 3px;
+        }
+        .tree ul {
+            padding-left: 20px;
+        }
+        .tree li {
+            list-style-type: none;
+            margin: 10px 0;
+            position: relative;
+        }
+        .tree li::before {
+            content: "";
+            position: absolute;
+            top: -7px;
+            left: -20px;
+            border-left: 2px solid #ccc;
+            border-bottom: 2px solid #ccc;
+            width: 20px;
+            height: 15px;
+        }
+        .tree li:last-child::before {
+            border-left: none;
+        }
+        .tree li::after {
+            position: absolute;
+            content: "";
+            top: 8px;
+            left: -20px;
+            border-left: 2px solid #ccc;
+            height: 100%;
+        }
+        .tree li:last-child::after {
+            display: none;
+        }
+        .package {
+            display: inline-block;
+            border: 1px solid #e0e0e0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .package:hover {
+            background-color: #e9e9e9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .package-name {
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .version {
+            color: #27ae60;
+            margin-left: 8px;
+        }
+        .required-version {
+            color: #e74c3c;
+            margin-left: 8px;
+        }
+        .toggle {
+            user-select: none;
+            margin-right: 5px;
+        }
+        .toggle::before {
+            content: '▼';
+            display: inline-block;
+            margin-right: 5px;
+            transition: transform 0.3s;
+        }
+        .collapsed > .package > .toggle::before {
+            transform: rotate(-90deg);
+        }
+        .collapsed > ul {
+            display: none;
+        }
+        #rawTextView {
+            white-space: pre-wrap;
+            font-family: monospace;
+            display: none;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            transition-duration: 0.4s;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dependency Tree</h1>
+        
+        <button id="toggleView" class="button" onclick="toggleView()">Switch to Raw Text View</button>
+
+        <div id="styledView">
+            {% if warnings %}
+            <div class="warnings">
+                <h2 onclick="toggleWarnings()">{{ warnings|length - 2 }} Warnings (click to expand/collapse)</h2>
+                <div id="warnings-content" class="warnings-content">
+                    {% for warning in warnings %}
+                    <div class="warning-item">{{ warning }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if tree %}
+            <div class="tree">
+                {% macro render_tree(node) %}
+                <li>
+                    <span class="package" onclick="toggleNode(this.parentNode)">
+                        {% if node.dependencies %}
+                        <span class="toggle"></span>
+                        {% endif %}
+                        <span class="package-name">{{ node.name }}</span>
+                        <span class="version">{{ node.version }}</span>
+                        {% if node.required_version %}
+                        <span class="required-version">(required: {{ node.required_version }})</span>
+                        {% endif %}
+                    </span>
+                    {% if node.dependencies %}
+                    <ul>
+                        {% for child in node.dependencies %}
+                            {{ render_tree(child) }}
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endmacro %}
+
+                <ul>
+                {% for package in tree %}
+                    {{ render_tree(package) }}
+                {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+            <p>No dependency data available or an error occurred while parsing the data.</p>
+            {% endif %}
+        </div>
+
+        <div id="rawTextView"></div>
+    </div>
+
+    <script>
+        function toggleWarnings() {
+            var content = document.getElementById('warnings-content');
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+            } else {
+                content.style.display = 'none';
+            }
+        }
+
+        function toggleNode(li) {
+            if (li.querySelector('ul')) {
+                li.classList.toggle('collapsed');
+            }
+        }
+
+        // Collapse all nodes except the first level by default
+        document.addEventListener('DOMContentLoaded', function() {
+            var allNodes = document.querySelectorAll('.tree li');
+            allNodes.forEach(function(node) {
+                if (node.parentNode.parentNode.classList.contains('tree')) {
+                    // First level node, leave it expanded
+                } else {
+                    node.classList.add('collapsed');
+                }
+            });
+            generateRawTextView();
+
+            // Ensure warnings are hidden initially
+            var warningsContent = document.getElementById('warnings-content');
+            if (warningsContent) {
+                warningsContent.style.display = 'none';
+            }
+        });
+
+        function generateRawTextView() {
+            var rawText = "";
+            {% if warnings %}
+            rawText += "Warnings:\n";
+            {% for warning in warnings %}
+            rawText += "{{ warning }}\n";
+            {% endfor %}
+            rawText += "\n";
+            {% endif %}
+
+            function traverseTree(node, prefix, isLast) {
+                rawText += prefix;
+                if (isLast) {
+                    rawText += "└── ";
+                    prefix += "    ";
+                } else {
+                    rawText += "├── ";
+                    prefix += "│   ";
+                }
+
+                rawText += node.name + " " + node.version;
+                if (node.required_version) {
+                    rawText += " (required: " + node.required_version + ")";
+                }
+                rawText += "\n";
+
+                if (node.dependencies) {
+                    for (var i = 0; i < node.dependencies.length; i++) {
+                        traverseTree(node.dependencies[i], prefix, i === node.dependencies.length - 1);
+                    }
+                }
+            }
+
+            {% for package in tree %}
+            traverseTree({{ package|tojson|safe }}, "", {% if loop.last %}true{% else %}false{% endif %});
+            {% endfor %}
+
+            document.getElementById('rawTextView').textContent = rawText;
+        }
+
+        function toggleView() {
+            var styledView = document.getElementById('styledView');
+            var rawTextView = document.getElementById('rawTextView');
+            var button = document.getElementById('toggleView');
+
+            if (styledView.style.display !== 'none') {
+                styledView.style.display = 'none';
+                rawTextView.style.display = 'block';
+                button.textContent = 'Switch to Styled View';
+            } else {
+                styledView.style.display = 'block';
+                rawTextView.style.display = 'none';
+                button.textContent = 'Switch to Raw Text View';
+            }
+        }
+    </script>
+</body>
+</html>

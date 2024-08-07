@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dependency Tree</title>
+    <!-- ... (keep your existing styles) ... -->
+</head>
+<body>
+    <div class="container">
+        <h1>Dependency Tree</h1>
+        
+        {% if warnings %}
+        <div class="warnings">
+            <h2 onclick="toggleWarnings()">Warnings (click to expand/collapse)</h2>
+            <div id="warnings-content" class="warnings-content">
+                {% for warning in warnings %}
+                <div class="warning-item">{{ warning }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if tree %}
+        <div class="tree">
+            {% macro render_tree(node) %}
+            <li>
+                <span class="package">
+                    <span class="package-name">{{ node.name }}</span>
+                    <span class="version">{{ node.version }}</span>
+                    {% if node.required_version %}
+                    <span class="required-version">(required: {{ node.required_version }})</span>
+                    {% endif %}
+                </span>
+                {% if node.dependencies %}
+                <ul>
+                    {% for child in node.dependencies %}
+                        {{ render_tree(child) }}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </li>
+            {% endmacro %}
+
+            <ul>
+            {% for package in tree %}
+                {{ render_tree(package) }}
+            {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <p>No dependency data available or an error occurred while parsing the data.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleWarnings() {
+            var content = document.getElementById('warnings-content');
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+            } else {
+                content.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
