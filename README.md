@@ -14,10 +14,10 @@ ComfyUI_EnvAutopsyAPI is a powerful debugging tool designed for ComfyUI that pro
 ## Installation
 
 1. Clone this repository into your ComfyUI custom_nodes directory:
-git clone https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI.git
+ - git clone https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI.git
    
 2. Install the required dependencies:
-pip install -r requirements.txt
+ - pip install -r requirements.txt
 
 ## Usage
 
