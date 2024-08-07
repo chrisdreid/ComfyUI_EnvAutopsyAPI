@@ -6,7 +6,7 @@
 
 '''
 
-import os
+import os,sys
 import subprocess
 import json
 
@@ -141,8 +141,10 @@ def parse_pipdeptree_output(warnings_stderr: str, json_stdout: str) -> Tuple[Lis
 async def serve_dependency_tree(request: web.Request) -> web.Response:
     try:
         # Run pipdeptree twice: once for warnings, once for JSON tree (unfortunate)
-        warnings_result = await run_command(['pipdeptree'])
-        json_result = await run_command(['pipdeptree', '--json-tree'])
+        pyexec = sys.executable
+        # more universal way to run: must test for stderr and stdout to validate that it works
+        warnings_result = await run_command([pyexec, '-m', 'pipdeptree'])
+        json_result = await run_command([pyexec, '-m', 'pipdeptree', '--json-tree'])
         
         warnings, tree = parse_pipdeptree_output(warnings_result['stderr'], json_result['stdout'])
         
