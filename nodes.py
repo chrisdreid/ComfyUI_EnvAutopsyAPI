@@ -167,6 +167,7 @@ async def serve_dependency_tree(request: web.Request) -> web.Response:
 
         # more universal way to run: must test for stderr and stdout to validate that it works
         json_result = await run_command([pyexec,'-m','pipdeptree','--json-tree'])
+
         
         warnings, tree = parse_pipdeptree_output(warnings_raw_text, json_result['stdout'])
         
