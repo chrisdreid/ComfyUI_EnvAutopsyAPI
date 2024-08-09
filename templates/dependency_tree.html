@@ -153,13 +153,11 @@
 <body>
     <div class="container">
         <h1>Dependency Tree</h1>
-        
-        <button id="toggleView" class="button" onclick="toggleView()">Switch to Raw Text View</button>
+        <button id="toggleView" class="button" onclick="{{ 'toggleView()'|safe }}">Switch to Raw Text View</button>
 
         <div id="styledView">
             {% if warnings %}
-            <div class="warnings">
-                <h2 onclick="toggleWarnings()">{{ warnings|length - 2 }} Warnings (click to expand/collapse)</h2>
+            <div class="warnings"><h2 onclick="{{ 'toggleWarnings()'|safe }}">{{ warnings|length - 2 }} Warnings (click to expand/collapse)</h2>
                 <div id="warnings-content" class="warnings-content">
                     {% for warning in warnings %}
                     <div class="warning-item">{{ warning }}</div>
@@ -172,7 +170,7 @@
             <div class="tree">
                 {% macro render_tree(node) %}
                 <li>
-                    <span class="package" onclick="toggleNode(this.parentNode)">
+                    <span class="package">
                         {% if node.dependencies %}
                         <span class="toggle"></span>
                         {% endif %}
@@ -207,22 +205,9 @@
     </div>
 
     <script>
-        function toggleWarnings() {
-            var content = document.getElementById('warnings-content');
-            if (content.style.display === 'none' || content.style.display === '') {
-                content.style.display = 'block';
-            } else {
-                content.style.display = 'none';
-            }
-        }
+        const raw_text = `{{ raw_text }}`;
+        const warnings_raw_text = `{{warnings_raw_text}}`;
 
-        function toggleNode(li) {
-            if (li.querySelector('ul')) {
-                li.classList.toggle('collapsed');
-            }
-        }
-
-        // Collapse all nodes except the first level by default
         document.addEventListener('DOMContentLoaded', function() {
             var allNodes = document.querySelectorAll('.tree li');
             allNodes.forEach(function(node) {
@@ -232,70 +217,58 @@
                     node.classList.add('collapsed');
                 }
             });
-            generateRawTextView();
-
+            
             // Ensure warnings are hidden initially
             var warningsContent = document.getElementById('warnings-content');
             if (warningsContent) {
                 warningsContent.style.display = 'none';
             }
+            
+            var treeNodes = document.querySelectorAll('.tree .package');
+            treeNodes.forEach(function(node) {
+                node.addEventListener('click', function() {
+                    toggleNode(this.parentNode);
+                });
+            });
         });
 
-        function generateRawTextView() {
-            var rawText = "";
-            {% if warnings %}
-            rawText += "Warnings:\n";
-            {% for warning in warnings %}
-            rawText += "{{ warning }}\n";
-            {% endfor %}
-            rawText += "\n";
-            {% endif %}
-
-            function traverseTree(node, prefix, isLast) {
-                rawText += prefix;
-                if (isLast) {
-                    rawText += "└── ";
-                    prefix += "    ";
-                } else {
-                    rawText += "├── ";
-                    prefix += "│   ";
-                }
-
-                rawText += node.name + " " + node.version;
-                if (node.required_version) {
-                    rawText += " (required: " + node.required_version + ")";
-                }
-                rawText += "\n";
-
-                if (node.dependencies) {
-                    for (var i = 0; i < node.dependencies.length; i++) {
-                        traverseTree(node.dependencies[i], prefix, i === node.dependencies.length - 1);
-                    }
-                }
+        function toggleWarnings() {
+            
+            var content = document.getElementById('warnings-content');
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+            } else {
+                content.style.display = 'none';
             }
-
-            {% for package in tree %}
-            traverseTree({{ package|tojson|safe }}, "", {% if loop.last %}true{% else %}false{% endif %});
-            {% endfor %}
-
-            document.getElementById('rawTextView').textContent = rawText;
         }
 
         function toggleView() {
+            
             var styledView = document.getElementById('styledView');
             var rawTextView = document.getElementById('rawTextView');
             var button = document.getElementById('toggleView');
 
+            
             if (styledView.style.display !== 'none') {
                 styledView.style.display = 'none';
                 rawTextView.style.display = 'block';
                 button.textContent = 'Switch to Styled View';
+                rawTextView.textContent = warnings_raw_text + raw_text;
+                
             } else {
+                rawTextView.textContent = "";
                 styledView.style.display = 'block';
                 rawTextView.style.display = 'none';
                 button.textContent = 'Switch to Raw Text View';
             }
         }
+        
+        function toggleNode(li) {
+            if (li.querySelector('ul')) {
+                li.classList.toggle('collapsed');
+            }
+        }
+
     </script>
 </body>
 </html>

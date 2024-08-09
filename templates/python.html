@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Packages</title>
+    <title>Python Information</title>
     <link rel="stylesheet" href="/env-autopsy-api/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Python Packages</h1>
+        <h1>Python Information</h1>
         
         <button id="toggleView" class="button" onclick="toggleView()">Switch to Raw Text View</button>
 
         <div id="styledView">
-            {% for package in packages %}
             <div class="package">
-                <span class="package-name">{{ package.name }}</span>
-                <span class="package-version">{{ package.version }}</span>
+                <span class="package-name">Python Version: </span>
+                <span class="package-version">{{ packages.version }}</span>
+            </div>
+            <hr>
+
+            <h1>Python: sys.path</h1>
+            {% for package in packages.path %}
+            <div class="package">
+                <span class="package-name">[{{ loop.index }}]</span>
+                <span class="package-version">{{ package }}</span>
             </div>
             {% endfor %}
         </div>
@@ -27,8 +34,8 @@
     <script>
         function generateRawTextView() {
             var rawText = "";
-            {% for package in packages %}
-            rawText += "{{ package.name }}=={{ package.version }}\n";
+            {% for package in packages.path %}
+            rawText += "{{ package }}\n";
             {% endfor %}
             document.getElementById('rawTextView').textContent = rawText;
         }

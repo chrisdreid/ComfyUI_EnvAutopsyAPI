@@ -6,7 +6,7 @@
 
 '''
 
-import os
+import os,sys
 import subprocess
 import json
 
@@ -98,11 +98,29 @@ async def get_pip_freeze() -> List[Package]:
     return [Package(*line.split('==')) for line in result['stdout'].splitlines() if '==' in line]
 
 
-@PromptServer.instance.routes.get("/api/pip_freeze")
+@PromptServer.instance.routes.get("/api/packages")
 async def serve_pip_freeze(request: web.Request) -> web.Response:
     try:
         packages = await get_pip_freeze()
         template = env.get_template('pip_freeze.html')
+        html_content = template.render(packages=packages)
+        return web.Response(text=html_content, content_type='text/html')
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        return web.Response(text=error_message, status=500)
+
+
+
+
+######################################################
+############# Get python information #############
+######################################################
+
+@PromptServer.instance.routes.get("/api/python")
+async def serve_pip_freeze(request: web.Request) -> web.Response:
+    try:
+        packages = sys
+        template = env.get_template('python.html')
         html_content = template.render(packages=packages)
         return web.Response(text=html_content, content_type='text/html')
     except Exception as e:
@@ -137,14 +155,20 @@ def parse_pipdeptree_output(warnings_stderr: str, json_stdout: str) -> Tuple[Lis
     return warnings, tree
 
 # Serve the dependency tree
-@PromptServer.instance.routes.get("/dependency_tree")
+@PromptServer.instance.routes.get("/api/dependency_tree")
 async def serve_dependency_tree(request: web.Request) -> web.Response:
     try:
+        pyexec = sys.executable
+
         # Run pipdeptree twice: once for warnings, once for JSON tree (unfortunate)
-        warnings_result = await run_command(['pipdeptree'])
-        json_result = await run_command(['pipdeptree', '--json-tree'])
+        ret = await run_command([pyexec,'-m','pipdeptree'])
+        warnings_raw_text = ret['stderr']
+        raw_text = ret['stdout']
+
+        # more universal way to run: must test for stderr and stdout to validate that it works
+        json_result = await run_command([pyexec,'-m','pipdeptree','--json-tree'])
         
-        warnings, tree = parse_pipdeptree_output(warnings_result['stderr'], json_result['stdout'])
+        warnings, tree = parse_pipdeptree_output(warnings_raw_text, json_result['stdout'])
         
         # Add debug information
         debug_info = {
@@ -155,7 +179,7 @@ async def serve_dependency_tree(request: web.Request) -> web.Response:
         }
         
         template = env.get_template('dependency_tree.html')
-        html_content = template.render(warnings=warnings, tree=tree, debug=debug_info)
+        html_content = template.render(warnings=warnings, tree=tree, debug=debug_info, raw_text=raw_text, warnings_raw_text=warnings_raw_text)
         
         return web.Response(text=html_content, content_type='text/html')
     except Exception as e:
@@ -163,7 +187,7 @@ async def serve_dependency_tree(request: web.Request) -> web.Response:
         return web.Response(text=error_message, status=500)
 
 # Add this line to serve static files
-PromptServer.instance.app.router.add_static('/env-debug-utils/', path=os.path.join(current_dir, 'static'), name='static')
+PromptServer.instance.app.router.add_static('/env-autopsy-api/', path=os.path.join(current_dir, 'static'), name='static')
 
 #############################################################
 NODE_CLASS_MAPPINGS = {}
