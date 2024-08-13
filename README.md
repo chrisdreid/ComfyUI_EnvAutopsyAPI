@@ -28,8 +28,9 @@ ComfyUI_EnvAutopsyAPI is a powerful debugging tool designed for ComfyUI that pro
 - List installed pip packages
 - Generate and visualize dependency trees
 - Provide warnings about potential conflicts in your Python environment
-- Serve results in various formats (HTML, JSON, plain text)
+- Serve results in various formats (HTML, JSON, plain text) ** JSON removed recently
 - Integrate seamlessly with ComfyUI's existing API structure
+- Ability to host it's own libs (**_plugin_libs**)
 
 ## Future Features
 
