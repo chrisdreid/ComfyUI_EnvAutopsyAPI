@@ -91,11 +91,13 @@ Here's a high-level overview of how ComfyUI_EnvAutopsyAPI works:
 graph TD
  A[User Request] --> B{API Endpoint}
  B -->|/api/env| C[Get Environment Variables]
- B -->|/api/pip_freeze| D[Get Pip Packages]
- B -->|/dependency_tree| E[Generate Dependency Tree]
+ B -->|/api/packages| D[Get Python Packages]
+ B -->|/api/dependency_tree| E[Generate Dependency Tree]
+ B -->|/api/python| S[Show python info and sys.path]
  C --> F[Process Data]
  D --> F
  E --> F
+ S --> F
  F --> G[Render HTML Template]
  G --> H[Return Response]
 ```
