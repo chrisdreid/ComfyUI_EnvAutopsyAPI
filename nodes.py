@@ -89,6 +89,20 @@ async def serve_environment(request: web.Request) -> web.Response:
         error_message = f"An error occurred: {str(e)}"
         return web.Response(text=error_message, status=500)
 
+######################################################
+############# Get Nodes ##############################
+######################################################
+
+@PromptServer.instance.routes.get("/api/nodes")
+async def serve_environment(request: web.Request) -> web.Response:
+    try:
+        template = env.get_template('nodes.html')
+        html_content = template.render()
+        return web.Response(text=html_content, content_type='text/html')
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        return web.Response(text=error_message, status=500)
+
 
 ######################################################
 ############# Get PIP freeze information #############
