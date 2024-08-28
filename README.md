@@ -67,8 +67,10 @@ You can also create a comfyui startup script or update the PYTHONPATH in your st
 Once installed, ComfyUI_EnvAutopsyAPI adds the following endpoints to your ComfyUI server:
 
 - `/api/env`: Displays all environment variables
-- `/api/pip_freeze`: Lists all installed pip packages
-- `/dependency_tree`: Generates and displays the dependency tree and possible conflicts
+- `/api/packages`: Lists all installed pip packages
+- `/api/dependency_tree`: Generates and displays the dependency tree and possible conflicts
+- `/api/python`: Generates and displays python info including version and sys.path
+- `/api/nodes`: Displays all nodes and their structure
 
 Example Url: http://localhost:8188/api/dependency_tree
 
@@ -80,7 +82,7 @@ Dependency Tree Text-Only:</br>
 <img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/dependency_tree-text.png" width="200" alt="Dependency Tree"></br>
 Environment Variables:</br>
 <img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/env_vars.png" width="200" alt="Environment Variables"></br>
-Pip Freeze:</br>
+Packages: ( previously `pip_freeze` )</br>
 <img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/pip_freeze.png" width="200" alt="Pip Freeze"></br>
 
 ## Workflow
@@ -94,10 +96,12 @@ graph TD
  B -->|/api/packages| D[Get Python Packages]
  B -->|/api/dependency_tree| E[Generate Dependency Tree]
  B -->|/api/python| S[Show python info and sys.path]
+ B -->|/api/nodes| N[Shows node information]
  C --> F[Process Data]
  D --> F
  E --> F
  S --> F
+ N --> F
  F --> G[Render HTML Template]
  G --> H[Return Response]
 ```
