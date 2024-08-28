@@ -25,12 +25,17 @@
         margin-bottom: 8px; /* Reduced vertical spacing */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         font-size: 11px; /* Further smaller text size */
-        width: 280px; /* Adjusted width for consistency */
+        width: 500px; /* Adjusted width for consistency */
+    }
+    .title-container {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
     }
     .node h4 {
         color: #fff;
-        margin: 0 0 4px 0; /* Further reduced margin for compactness */
-        cursor: pointer;
+        margin: 0 4px 4px 0;
+        flex-grow: 1;
     }
     label {
         color: #ccc;
@@ -50,125 +55,151 @@
     .node-contents {
         display: none; /* Ensure contents are hidden initially */
     }
+    .node-name {
+        font-size: 10px;
+        color: #4c8a4b;
+        margin-right: 4px;
+    }
+    .filepath {
+        font-size: 10px;
+        color: #888;
+        margin-top: 4px;
+        word-break: break-all;
+    }
 </style>
 </head>
 <body>
-
-    <!-- <button id="toggleButton">Toggle Raw Data</button> -->
     <div id="nodesContainer"></div>
-    <!-- <pre id="rawData"></pre> -->
 
 <script>
 
-// function toggleRawData() {
-//     const rawDataEl = document.getElementById('rawData');
-//     rawDataEl.style.display = rawDataEl.style.display === 'block' ? 'none' : 'block';
-//     rawDataEl.textContent = rawDataEl.style.display === 'block' ? JSON.stringify(nodesData, null, 2) : '';
-// }
+    const node_filepath_lut = {{ node_filepath_lut }};
 
-// document.getElementById('toggleButton').addEventListener('click', toggleRawData);
+    function createNode(data) {
+        
+        const node = document.createElement('div');
+        node.className = 'node';
+        
+        const titleContainer = document.createElement('div');
+        titleContainer.className = 'title-container';
+        
+        const title = document.createElement('h4');
+        title.textContent = data.display_name;
+        titleContainer.appendChild(title);
+        
+        const nodeName = document.createElement('span');
+        nodeName.className = 'node-name';
+        nodeName.textContent = ` [ ${data.name} ]`;
+        titleContainer.appendChild(nodeName);
+        
+        node.appendChild(titleContainer);
 
-function createNode(data) {
-    const node = document.createElement('div');
-    node.className = 'node';
-    
-    const title = document.createElement('h4');
-    title.textContent = data.display_name;
-    node.appendChild(title);
+        // Add filepath information
+        const filepath = document.createElement('div');
+        filepath.className = 'filepath';
+        filepath.textContent = node_filepath_lut[data.name] || 'Filepath not found';
+        node.appendChild(filepath);
 
-    const nodeContents = document.createElement('div');
-    nodeContents.className = 'node-contents';
+        const nodeContents = document.createElement('div');
+        nodeContents.className = 'node-contents';
 
-    if (data.input && data.input.required) {
-        Object.entries(data.input.required).forEach(([key, options]) => {
-            const label = document.createElement('label');
-            label.textContent = key + ': ';
-            const select = document.createElement('select');
-            let optionsArray = [];
+        if (data.input && data.input.required) {
+            Object.entries(data.input.required).forEach(([key, options]) => {
+                const label = document.createElement('label');
+                label.textContent = key + ': ';
+                const select = document.createElement('select');
+                let optionsArray = [];
 
-            // Check if options is a string and contains commas
-            if (typeof options === 'string' && options.includes(',')) {
-                optionsArray = options.split(',').map(option => option.trim());
-            } else if (Array.isArray(options)) {
-                optionsArray = options.flat(); // Flatten the array in case it's an array of arrays
-            } else {
-                optionsArray = [options]; // Treat it as a single option array
-            }
+                // Check if options is a string and contains commas
+                if (typeof options === 'string' && options.includes(',')) {
+                    optionsArray = options.split(',').map(option => option.trim());
+                } else if (Array.isArray(options)) {
+                    optionsArray = options.flat(); // Flatten the array in case it's an array of arrays
+                } else {
+                    optionsArray = [options]; // Treat it as a single option array
+                }
 
-            // Set tooltip to show all options
-            select.title = optionsArray.join(', ');
+                // Set tooltip to show all options
+                select.title = optionsArray.join(', ');
 
-            optionsArray.forEach(option => {
-                const optionElement = document.createElement('option');
-                optionElement.value = option;
-                optionElement.textContent = option;
-                select.appendChild(optionElement);
+                optionsArray.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    select.appendChild(optionElement);
+                });
+
+                label.appendChild(select);
+                nodeContents.appendChild(label);
             });
-
-            label.appendChild(select);
-            nodeContents.appendChild(label);
-        });
-    }
-
-    if (data.input && data.input.optional) {
-        Object.entries(data.input.optional).forEach(([key, value]) => {
-            const label = document.createElement('label');
-            label.textContent = key + ': ';
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = value;
-            input.title = value; // Set tooltip
-            
-            label.appendChild(input);
-            nodeContents.appendChild(label);
-        });
-    }
-
-    node.appendChild(nodeContents);
-
-    title.addEventListener('click', function() {
-        nodeContents.style.display = nodeContents.style.display === 'block' ? 'none' : 'block';
-        if (nodeContents.style.display === 'block') {
-            ensureVisibility(node);
         }
-    });
 
-    return node;
-}
+        if (data.input && data.input.optional) {
+            Object.entries(data.input.optional).forEach(([key, value]) => {
+                const label = document.createElement('label');
+                label.textContent = key + ': ';
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = value;
+                input.title = value; // Set tooltip
+                
+                label.appendChild(input);
+                nodeContents.appendChild(label);
+            });
+        }
 
-function ensureVisibility(node) {
-    const rect = node.getBoundingClientRect();
-    if (rect.top < 0 || rect.bottom > window.innerHeight) { // Check if the node is out of view
-        window.scrollTo({
-            top: window.pageYOffset + rect.top - 20, // Adjust to bring node into view
-            behavior: 'smooth'
+        node.appendChild(nodeContents);
+
+        // title.addEventListener('click', function() {
+        //     nodeContents.style.display = nodeContents.style.display === 'block' ? 'none' : 'block';
+        //     if (nodeContents.style.display === 'block') {
+        //         ensureVisibility(node);
+        //     }
+        // });
+        
+        titleContainer.addEventListener('click', function() {
+            nodeContents.style.display = nodeContents.style.display === 'block' ? 'none' : 'block';
+            if (nodeContents.style.display === 'block') {
+                ensureVisibility(node);
+            }
+        });
+
+        return node;
+    }
+
+    function ensureVisibility(node) {
+        const rect = node.getBoundingClientRect();
+        if (rect.top < 0 || rect.bottom > window.innerHeight) { // Check if the node is out of view
+            window.scrollTo({
+                top: window.pageYOffset + rect.top - 20, // Adjust to bring node into view
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    function displayNodes(nodeDict) {
+        const container = document.getElementById('nodesContainer');
+        Object.values(nodeDict).forEach(nodeData => {
+            if (nodeData) {
+                const newNode = createNode(nodeData);
+                container.appendChild(newNode);
+            }
         });
     }
-}
-
-function displayNodes(nodeDict) {
-    const container = document.getElementById('nodesContainer');
-    Object.values(nodeDict).forEach(nodeData => {
-        if (nodeData) {
-            const newNode = createNode(nodeData);
-            container.appendChild(newNode);
+    async function fetchNodesData() {
+        try {
+            //const response = await fetch('http://localhost:8188/object_info');
+            // needs to be dynamic to this server and port but back from ../object_info
+            const response = await fetch('../../object_info');
+            const nodeDict = await response.json();
+            displayNodes(nodeDict);
+        } catch (error) {
+            console.error('Failed to fetch nodes data:', error);
         }
-    });
-}
-async function fetchNodesData() {
-    try {
-        //const response = await fetch('http://localhost:8188/object_info');
-        // needs to be dynamic to this server and port but back from ../object_info
-        const response = await fetch('../../object_info');
-        const nodeDict = await response.json();
-        displayNodes(nodeDict);
-    } catch (error) {
-        console.error('Failed to fetch nodes data:', error);
     }
-}
-document.addEventListener('DOMContentLoaded', () => {
-    fetchNodesData();
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchNodesData();
+    });
 </script>
 
 </body>

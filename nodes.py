@@ -94,10 +94,16 @@ async def serve_environment(request: web.Request) -> web.Response:
 ######################################################
 
 @PromptServer.instance.routes.get("/api/nodes")
-async def serve_environment(request: web.Request) -> web.Response:
+async def serve_nodes(request: web.Request) -> web.Response:
+    
+    import inspect
+    import nodes
+    node_filepath_lut = {}
+    for node_class_name in nodes.NODE_CLASS_MAPPINGS:
+        node_filepath_lut[node_class_name] = os.path.relpath(inspect.getfile(nodes.NODE_CLASS_MAPPINGS[node_class_name])).replace('\\','/')
     try:
         template = env.get_template('nodes.html')
-        html_content = template.render()
+        html_content = template.render(node_filepath_lut=node_filepath_lut)
         return web.Response(text=html_content, content_type='text/html')
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
