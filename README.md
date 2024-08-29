@@ -83,7 +83,9 @@ Dependency Tree Text-Only:</br>
 Environment Variables:</br>
 <img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/env_vars.png" width="200" alt="Environment Variables"></br>
 Packages: ( previously `pip_freeze` )</br>
-<img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/pip_freeze.png" width="200" alt="Pip Freeze"></br>
+<img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/pip_freeze.png" width="200" alt="Packages"></br>
+Nodes: </br>
+<img src="https://github.com/chrisdreid/ComfyUI_EnvAutopsyAPI/blob/main/images/api_nodes_01.png" width="200" alt="Nodes"></br>
 
 ## Workflow
 
